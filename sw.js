@@ -1,7 +1,7 @@
 // GymLog — service worker: la app funciona 100% offline y se actualiza sola.
 // Estrategia: stale-while-revalidate. Sirve del cache al instante (rápido y sin conexión)
 // y en paralelo baja la versión nueva para el próximo arranque.
-const CACHE = 'gymlog-v2';
+const CACHE = 'gymlog-v3';
 const ASSETS = ['./','./index.html','./style.css','./app.js','./data.js','./manifest.webmanifest',
   './icon.svg','./icon-180.png','./icon-512.png','./icon-maskable-512.png'];
 

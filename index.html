@@ -23,7 +23,7 @@
     </header>
     <div id="backup-hint"></div>
     <div id="routines-list"></div>
-    <button class="btn primary big wide" id="btn-new-routine" onclick="openEditor(null)">＋ Nueva rutina</button>
+    <button class="btn primary big wide" id="btn-new-routine" onclick="openEditor(null)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Nueva rutina</button>
   </section>
 
   <!-- TAB: Progreso -->
@@ -32,16 +32,16 @@
     <div id="prog-stats" class="statrow"></div>
     <div class="card calcard">
       <div class="calhead">
-        <button class="btn icon" onclick="calMove(-1)">‹</button>
+        <button class="btn icon" onclick="calMove(-1)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
         <div id="cal-title" class="caltitle"></div>
-        <button class="btn icon" onclick="calMove(1)">›</button>
+        <button class="btn icon" onclick="calMove(1)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button>
       </div>
       <div class="calgrid caldows"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
       <div id="cal-grid" class="calgrid"></div>
       <div id="day-detail"></div>
     </div>
     <h2>Por ejercicio</h2>
-    <button class="btn ghost wide" onclick="pickExerciseProgress()">📈 Ver progreso de un ejercicio</button>
+    <button class="btn ghost wide" onclick="pickExerciseProgress()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg> Ver progreso de un ejercicio</button>
     <h2>Volumen por rutina</h2>
     <div id="rvol-chips" class="chips"></div>
     <div id="rvol-chart"></div>
@@ -60,7 +60,7 @@
 <!-- Pantalla: editor de rutina -->
 <section id="screen-editor" class="screen">
   <header class="screenhead">
-    <button class="btn icon" onclick="closeEditor()">←</button>
+    <button class="btn icon" onclick="closeEditor()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
     <input id="ed-name" class="namein" placeholder="Nombre (ej: Rutina A)" maxlength="30">
     <button class="btn primary" onclick="saveEditor()">Guardar</button>
   </header>
@@ -70,7 +70,7 @@
 <!-- Pantalla: entrenamiento activo -->
 <section id="screen-workout" class="screen">
   <header class="screenhead">
-    <button class="btn icon" onclick="closeWorkout()" title="Minimizar">▾</button>
+    <button class="btn icon" onclick="closeWorkout()" title="Minimizar"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M5 9l7 7 7-7"/></svg></button>
     <div class="wk-head">
       <div id="wk-title"></div>
       <div id="wk-elapsed" class="muted small"></div>
@@ -83,7 +83,7 @@
 <!-- Pantalla: detalle de ejercicio -->
 <section id="screen-exdetail" class="screen">
   <header class="screenhead">
-    <button class="btn icon" onclick="closeScreen('screen-exdetail')">←</button>
+    <button class="btn icon" onclick="closeScreen('screen-exdetail')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
     <div class="wk-head"><div id="exd-title"></div></div>
     <span class="sp44"></span>
   </header>
@@ -96,8 +96,8 @@
   <div class="restrow">
     <div><div class="restlabel">Descanso</div><div id="rest-time">0:00</div></div>
     <div class="restbtns">
-      <button class="btn ghost" onclick="restAdj(-15)">−15s</button>
-      <button class="btn ghost" onclick="restAdj(15)">+15s</button>
+      <button class="btn ghost" onclick="restAdj(-15)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M5 12h14"/></svg>15s</button>
+      <button class="btn ghost" onclick="restAdj(15)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>15s</button>
       <button class="btn primary" onclick="restSkip()">Saltar</button>
     </div>
   </div>
@@ -105,13 +105,13 @@
 
 <!-- Banner entrenamiento activo (visible al minimizar) -->
 <button id="active-banner" class="hidden" onclick="openWorkout()">
-  ▶ <span id="ab-name"></span> en curso — tocá para volver
+  <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="currentColor" stroke="none"/></svg> <span id="ab-name"></span> en curso — tocá para volver
 </button>
 
 <nav id="bottomnav">
-  <button data-tab="rutinas" class="active" onclick="showTab('rutinas')"><span class="nicon">🏋️</span><span>Rutinas</span></button>
-  <button data-tab="progreso" onclick="showTab('progreso')"><span class="nicon">📈</span><span>Progreso</span></button>
-  <button data-tab="ajustes" onclick="showTab('ajustes')"><span class="nicon">⚙️</span><span>Ajustes</span></button>
+  <button data-tab="rutinas" class="active" onclick="showTab('rutinas')"><span class="nicon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M1.5 9v6M6 5v14M18 5v14M22.5 9v6M6 12h12"/></svg></span><span>Rutinas</span></button>
+  <button data-tab="progreso" onclick="showTab('progreso')"><span class="nicon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span><span>Progreso</span></button>
+  <button data-tab="ajustes" onclick="showTab('ajustes')"><span class="nicon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg></span><span>Ajustes</span></button>
 </nav>
 
 <div id="modal-root"></div>

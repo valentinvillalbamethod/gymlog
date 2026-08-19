@@ -19,8 +19,50 @@ function haceDias(ts){
   if(diff === 1) return 'ayer';
   return 'hace '+diff+' días';
 }
-function toast(msg, ms=2400){
-  const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden');
+/* ================= Íconos =================
+   SVG en línea, trazo cuadrado para acompañar la estética de bordes rectos.
+   Heredan el color del texto (currentColor), así sirven en cualquier fondo. */
+const ICONS = {
+  pesa:      '<path d="M1.5 9v6M6 5v14M18 5v14M22.5 9v6M6 12h12"/>',
+  grafico:   '<path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/>',
+  ajustes:   '<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
+  mas:       '<path d="M12 5v14M5 12h14"/>',
+  menos:     '<path d="M5 12h14"/>',
+  atras:     '<path d="M19 12H5M12 19l-7-7 7-7"/>',
+  abajo:     '<path d="M5 9l7 7 7-7"/>',
+  izq:       '<path d="M15 18l-6-6 6-6"/>',
+  der:       '<path d="M9 18l6-6-6-6"/>',
+  play:      '<path d="M6 4l14 8-14 8z" fill="currentColor" stroke="none"/>',
+  editar:    '<path d="M4 20h4L20 8l-4-4L4 16v4z"/><path d="M14 6l4 4"/>',
+  basura:    '<path d="M3 6h18M8 6V3h8v3M6 6l1 15h10l1-15M10 10v7M14 10v7"/>',
+  cerrar:    '<path d="M6 6l12 12M18 6L6 18"/>',
+  arriba:    '<path d="M12 19V5M5 12l7-7 7 7"/>',
+  abajoFlecha:'<path d="M12 5v14M5 12l7 7 7-7"/>',
+  flechaDer: '<path d="M4 12h16M13 5l7 7-7 7"/>',
+  cadena:    '<path d="M8 7H4v10h4M16 7h4v10h-4M9 12h6"/>',
+  cortar:    '<path d="M8 7H4v10h4M16 7h4v10h-4M9 12h2M13 12h2"/><path d="M4 21L20 3"/>',
+  reloj:     '<path d="M12 21a8 8 0 100-16 8 8 0 000 16z"/><path d="M12 9v4l3 2M9 2h6"/>',
+  tilde:     '<path d="M4 12l5 5L20 6"/>',
+  trofeo:    '<path d="M7 3h10v6a5 5 0 01-10 0V3z"/><path d="M7 5H4v2a3 3 0 003 3M17 5h3v2a3 3 0 01-3 3"/><path d="M12 14v4M8 21h8M8 18h8"/>',
+  bajar:     '<path d="M12 3v12M7 10l5 5 5-5M4 21h16"/>',
+  subir:     '<path d="M12 21V9M7 14l5-5 5 5M4 3h16"/>',
+  alerta:    '<path d="M12 3L2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/>',
+  rayo:      '<path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/>',
+  lista:     '<path d="M4 6h16M4 12h16M4 18h16"/>',
+  sigma:     '<path d="M18 4H6l7 8-7 8h12"/>'
+};
+// ic('tilde') → SVG listo para meter en una plantilla de HTML.
+function ic(name, cls){
+  const d = ICONS[name];
+  if(!d) return '';
+  return '<svg class="ic'+(cls ? ' '+cls : '')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" '+
+    'stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true">'+d+'</svg>';
+}
+// El toast acepta un ícono opcional delante del texto.
+function toast(msg, ms=2400, icon){
+  const t = $('#toast');
+  t.innerHTML = (icon ? ic(icon) : '') + '<span>'+esc(msg)+'</span>';
+  t.classList.remove('hidden');
   clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.add('hidden'), ms);
 }
 
@@ -102,7 +144,7 @@ function loadDB(){
     // Datos ilegibles: se conservan aparte en vez de pisarlos con el primer guardado.
     console.error('DB ilegible', e);
     try{ localStorage.setItem(KEY+'_corrupto_'+Date.now(), raw); }catch(e2){}
-    setTimeout(()=>toast('⚠️ Datos ilegibles. Se guardó una copia; podés importar un respaldo.', 8000), 800);
+    setTimeout(()=>toast('Datos ilegibles. Se guardó una copia; podés importar un respaldo.', 8000, 'alerta'), 800);
     return clone(DEFAULTS);
   }
 }
@@ -110,7 +152,7 @@ let db = loadDB();
 let persistAsked = false;
 function save(){
   try{ localStorage.setItem(KEY, JSON.stringify(db)); }
-  catch(e){ toast('⚠️ No se pudo guardar: '+e.message); }
+  catch(e){ toast('No se pudo guardar: '+e.message, 2400, 'alerta'); }
   if(!persistAsked){
     persistAsked = true;
     try{ navigator.storage && navigator.storage.persist && navigator.storage.persist(); }catch(e){}
@@ -166,10 +208,10 @@ function renderHome(){
   $('#home-last').textContent = last ? ('Última: '+last.name+' · '+haceDias(last.endedAt)) : '';
   const needBackup = db.sessions.length >= 3 && (Date.now() - (db.settings.lastBackup||0)) > 14*86400000;
   $('#backup-hint').innerHTML = needBackup
-    ? '<div class="card">💾 Hace más de 2 semanas que no exportás un respaldo. Andá a <b>Ajustes → Exportar</b>.</div>' : '';
+    ? '<div class="card">'+ic('bajar')+' Hace más de 2 semanas que no exportás un respaldo. Andá a <b>Ajustes → Exportar</b>.</div>' : '';
   const list = $('#routines-list');
   if(!db.routines.length){
-    list.innerHTML = '<div class="empty">Todavía no tenés rutinas.<br>Creá la primera con el botón de abajo 💪</div>';
+    list.innerHTML = '<div class="empty">Todavía no tenés rutinas.<br>Creá la primera con el botón de abajo</div>';
     return;
   }
   list.innerHTML = db.routines.map(r=>{
@@ -181,8 +223,8 @@ function renderHome(){
       '<div class="rtitle">'+esc(r.name)+'</div>'+
       '<div class="rmeta muted small">'+esc(meta)+'</div>'+
       '<div class="ractions">'+
-        '<button class="btn primary" onclick="startWorkout(\''+r.id+'\')">▶ Entrenar</button>'+
-        '<button class="btn ghost" onclick="openEditor(\''+r.id+'\')">✎ Editar</button>'+
+        '<button class="btn primary" onclick="startWorkout(\''+r.id+'\')">'+ic('play')+' Entrenar</button>'+
+        '<button class="btn ghost" onclick="openEditor(\''+r.id+'\')">'+ic('editar')+' Editar</button>'+
       '</div></div>';
   }).join('');
 }
@@ -221,27 +263,27 @@ function renderEditor(){
         '<div class="prevtxt"></div>'+
         '<input class="setin" type="number" inputmode="decimal" step="0.5" min="0" placeholder="kg" value="'+(s.w??'')+'" onchange="edSet('+i+','+j+',\'w\',this.value)">'+
         '<input class="setin" type="number" inputmode="numeric" step="1" min="0" placeholder="reps" value="'+(s.r??'')+'" onchange="edSet('+i+','+j+',\'r\',this.value)">'+
-        '<button class="rowdel" onclick="edDelSet('+i+','+j+')">✕</button>'+
+        '<button class="rowdel" onclick="edDelSet('+i+','+j+')">'+ic('cerrar')+'</button>'+
       '</div>').join('');
     return '<div class="excard '+(gIdx>=0?'ss ss-'+(gIdx%4):'')+'">'+
       '<div class="exhead"><div>'+badge+'<div class="exname">'+esc(ex.n)+'</div><div class="exmuscle">'+esc(ex.m)+'</div></div>'+
       '<div class="exbtns">'+
-        '<button class="btn" title="Subir" onclick="edMove('+i+',-1)">↑</button>'+
-        '<button class="btn" title="Bajar" onclick="edMove('+i+',1)">↓</button>'+
-        '<button class="btn" title="Quitar" onclick="edDelEx('+i+')">🗑</button>'+
+        '<button class="btn" title="Subir" onclick="edMove('+i+',-1)">'+ic('arriba')+'</button>'+
+        '<button class="btn" title="Bajar" onclick="edMove('+i+',1)">'+ic('abajoFlecha')+'</button>'+
+        '<button class="btn" title="Quitar" onclick="edDelEx('+i+')">'+ic('basura')+'</button>'+
       '</div></div>'+
       '<div class="setshead"><span>#</span><span></span><span>KG</span><span>REPS</span><span></span></div>'+
       rows+
       '<div class="setxs">'+
-        '<button class="btn mini ghost" onclick="edAddSet('+i+')">＋ serie</button>'+
-        (i>0 ? '<button class="btn mini ghost" onclick="edToggleSS('+i+')">'+(linkedWithPrev(i)?'✂ Quitar superserie':'⛓ Superserie con anterior')+'</button>' : '')+
-        '<button class="btn mini ghost" onclick="edRest('+i+')">⏱ '+(it.rest!=null ? it.rest+'s' : 'descanso')+'</button>'+
+        '<button class="btn mini ghost" onclick="edAddSet('+i+')">'+ic('mas')+' serie</button>'+
+        (i>0 ? '<button class="btn mini ghost" onclick="edToggleSS('+i+')">'+(linkedWithPrev(i)? ic('cortar')+' Quitar superserie' : ic('cadena')+' Superserie con anterior')+'</button>' : '')+
+        '<button class="btn mini ghost" onclick="edRest('+i+')">'+ic('reloj')+' '+(it.rest!=null ? it.rest+'s' : 'descanso')+'</button>'+
       '</div>'+
     '</div>';
   }).join('') + edFoot();
 }
 function edFoot(){
-  return '<button class="btn ghost wide" onclick="openPicker(pickerAddToEditor)">＋ Agregar ejercicio</button>'+
+  return '<button class="btn ghost wide" onclick="openPicker(pickerAddToEditor)">'+ic('mas')+' Agregar ejercicio</button>'+
     (ed.id ? '<button class="btn danger wide" onclick="edDeleteRoutine()">Eliminar rutina</button>' : '');
 }
 function edSet(i,j,k,v){ ed.items[i].sets[j][k] = v==='' ? null : Number(v); }
@@ -322,7 +364,7 @@ function saveEditor(){
     ed.id = uid();
     db.routines.push(clone(ed));
   }
-  save(); closeEditor(); showTab('rutinas'); toast('Rutina guardada ✔');
+  save(); closeEditor(); showTab('rutinas'); toast('Rutina guardada', 2400, 'tilde');
 }
 function pickerAddToEditor(exId){
   ed.items.push({exId, rest:null, ss:null, sets:[{r:10,w:null},{r:10,w:null},{r:10,w:null}]});
@@ -334,7 +376,7 @@ let pick = null;
 function normTxt(s){ return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
 function openPicker(cb, opts){
   pick = { cb, q:'', muscle:'Todos', multi: !(opts && opts.multi===false), added:new Set() };
-  modal('<div class="sheethead"><div class="stitle">Ejercicios</div><button class="btn icon" onclick="closeModal()">✕</button></div>'+
+  modal('<div class="sheethead"><div class="stitle">Ejercicios</div><button class="btn icon" onclick="closeModal()">'+ic('cerrar')+'</button></div>'+
     '<div style="padding:0 16px"><input id="pick-q" class="searchin" placeholder="Buscar ejercicio…" oninput="pickQ(this.value)"></div>'+
     '<div class="chips" id="pick-chips"></div>'+
     '<div class="sheetbody" id="pick-list"></div>'+
@@ -360,12 +402,12 @@ function renderPickList(){
     html += '<div class="mgroup">'+m+'</div>'+groups[m].map(e=>{
       const added = pick.added.has(e.id);
       return '<button class="pickrow '+(added?'added':'')+'" onclick="pickSel(\''+e.id+'\')">'+
-        '<span class="pname">'+esc(e.n)+'</span>'+(added?'<span class="pchk">✔</span>':'')+'</button>';
+        '<span class="pname">'+esc(e.n)+'</span>'+(added? '<span class="pchk">'+ic('tilde')+'</span>' : '')+'</button>';
     }).join('');
   }
   if((pick.q||'').trim().length >= 2){
     html += '<div class="mgroup">¿No está en la lista?</div>'+
-      '<button class="pickrow" onclick="pickCreate()"><span class="pname">＋ Crear «'+esc(pick.q.trim())+'»</span></button>';
+      '<button class="pickrow" onclick="pickCreate()"><span class="pname">'+ic('mas')+' Crear «'+esc(pick.q.trim())+'»</span></button>';
   }
   $('#pick-list').innerHTML = html || '<div class="empty">Sin resultados</div>';
 }
@@ -459,7 +501,7 @@ function renderWorkout(){
       i = j;
     } else { html += wkExCard(i); i++; }
   }
-  html += '<button class="btn ghost wide" onclick="openPicker(wkAddExercise)">＋ Agregar ejercicio</button>';
+  html += '<button class="btn ghost wide" onclick="openPicker(wkAddExercise)">'+ic('mas')+' Agregar ejercicio</button>';
   html += '<button class="btn danger wide" onclick="discardWorkout()">Descartar entrenamiento</button>';
   $('#wk-body').innerHTML = html;
   updateElapsed();
@@ -469,20 +511,20 @@ function wkExCard(i){
   const rows = e.sets.map((s,j)=>
     '<div class="setrow '+(s.done?'done':'')+'">'+
       '<div class="setnum">'+(j+1)+'</div>'+
-      '<div class="prevtxt">'+esc(s.prev||'—')+(s.isPR && s.done ? ' 🏆':'')+'</div>'+
+      '<div class="prevtxt">'+esc(s.prev||'—')+(s.isPR && s.done ? ic('trofeo','pr') : '')+'</div>'+
       '<input class="setin" type="number" inputmode="decimal" step="0.5" min="0" placeholder="kg" value="'+(s.w===''?'':s.w)+'" onchange="wkSet('+i+','+j+',\'w\',this.value)">'+
       '<input class="setin" type="number" inputmode="numeric" step="1" min="0" placeholder="reps" value="'+(s.r===''?'':s.r)+'" onchange="wkSet('+i+','+j+',\'r\',this.value)">'+
-      '<button class="setchk" onclick="wkToggle('+i+','+j+')">✔</button>'+
+      '<button class="setchk" onclick="wkToggle('+i+','+j+')">'+ic('tilde')+'</button>'+
     '</div>').join('');
   const restTxt = e.rest!=null ? e.rest+'s' : db.settings.restSet+'s';
   return '<div class="excard">'+
     '<div class="exhead"><div><div class="exname">'+esc(ex.n)+'</div><div class="exmuscle">'+esc(ex.m)+' · descanso '+restTxt+'</div></div>'+
-    '<div class="exbtns"><button class="btn" title="Historial" onclick="openExDetail(\''+e.exId+'\')">📈</button></div></div>'+
+    '<div class="exbtns"><button class="btn" title="Historial" onclick="openExDetail(\''+e.exId+'\')">'+ic('grafico')+'</button></div></div>'+
     '<div class="setshead"><span>#</span><span>Anterior</span><span>KG</span><span>REPS</span><span></span></div>'+
     rows+
     '<div class="setxs">'+
-      '<button class="btn mini ghost" onclick="wkAddSet('+i+')">＋ serie</button>'+
-      '<button class="btn mini ghost" onclick="wkDelSet('+i+')">− serie</button>'+
+      '<button class="btn mini ghost" onclick="wkAddSet('+i+')">'+ic('mas')+' serie</button>'+
+      '<button class="btn mini ghost" onclick="wkDelSet('+i+')">'+ic('menos')+' serie</button>'+
     '</div>'+
   '</div>';
 }
@@ -537,13 +579,13 @@ function wkToggle(i,j){
     if(w > 0 && e.pr > 0 && w > e.pr){
       s.isPR = true;
       e.pr = w;
-      toast('🏆 ¡Récord! '+fmtW(w)+' kg en '+exById(e.exId).n);
+      toast('¡Récord! '+fmtW(w)+' kg en '+exById(e.exId).n, 2400, 'trofeo');
     }
     const secs = restSecsFor(i,j);
     if(secs > 0) startRest(secs);
     else {
       const nxt = siguienteEnGrupo(A,i);
-      if(nxt >= 0) toast('→ '+exById(A.entries[nxt].exId).n, 1600);
+      if(nxt >= 0) toast(exById(A.entries[nxt].exId).n, 1600, 'flechaDer');
     }
   } else {
     // Al desmarcar se deshace todo lo que provocó el marcado.
@@ -598,7 +640,7 @@ function restSkip(){ if(db.active){ db.active.rest = null; save(); } renderRest(
 function restDone(notify){
   if(db.active) db.active.rest = null;
   save(); renderRest();
-  if(notify){ beep(); vib([220,120,220,120,320]); toast('💪 ¡A la siguiente serie!'); }
+  if(notify){ beep(); vib([220,120,220,120,320]); toast('¡A la siguiente serie!', 2400, 'rayo'); }
 }
 function renderRest(){
   const R = db.active && db.active.rest;
@@ -659,7 +701,7 @@ function finishWorkout(){
       closeScreen('screen-workout');
       $('#active-banner').classList.add('hidden'); syncBody();
       showTab('progreso');
-      toast('Entrenamiento guardado ✔ '+fmtNum(vol)+' kg');
+      toast('Entrenamiento guardado · '+fmtNum(vol)+' kg', 2400, 'tilde');
     });
 }
 function discardWorkout(){
@@ -804,7 +846,7 @@ function renderHistory(){
       '</div>' : '';
     return '<div class="card sess" onclick="histToggle(\''+s.id+'\')">'+
       '<div class="sesshead"><span class="sname">'+esc(s.name)+'</span><span class="muted small">'+fmtFecha(s.endedAt)+'</span></div>'+
-      '<div class="sessmeta"><span>⏱ '+fmtDur(s.endedAt-s.startedAt)+'</span><span>✅ '+sessionDoneSets(s)+' series</span><span>Σ '+fmtNum(sessionVolume(s))+' kg</span></div>'+
+      '<div class="sessmeta"><span>'+ic('reloj')+fmtDur(s.endedAt-s.startedAt)+'</span><span>'+ic('lista')+sessionDoneSets(s)+' series</span><span>'+ic('sigma')+fmtNum(sessionVolume(s))+' kg</span></div>'+
       detail+'</div>';
   }).join('');
 }
@@ -903,7 +945,7 @@ function renderSettings(){
   if(navigator.storage && navigator.storage.persisted){
     navigator.storage.persisted().then(p=>{
       const el = $('#persist-state');
-      if(el) el.textContent = p ? '✔ Activado: el navegador protege tus datos' : 'No garantizado — exportá respaldos seguido';
+      if(el) el.textContent = p ? 'Activado: el navegador protege tus datos' : 'No garantizado — exportá respaldos seguido';
     });
   } else {
     const el = $('#persist-state');
@@ -925,7 +967,7 @@ function exportData(){
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
   db.settings.lastBackup = Date.now();
-  save(); renderSettings(); toast('Respaldo exportado 💾');
+  save(); renderSettings(); toast('Respaldo exportado', 2400, 'bajar');
 }
 function importData(input){
   const f = input.files && input.files[0];
@@ -941,7 +983,7 @@ function importData(input){
       confirmDlg('Importar respaldo',
         'Se reemplazan los datos actuales por los del archivo ('+limpio.routines.length+' rutinas, '+limpio.sessions.length+' sesiones).',
         'Importar', ()=>{ db = limpio; save(); location.reload(); });
-    }catch(e){ toast('⚠️ Archivo inválido: '+e.message); }
+    }catch(e){ toast('Archivo inválido: '+e.message, 2400, 'alerta'); }
   };
   rd.readAsText(f);
   input.value = '';
@@ -967,7 +1009,7 @@ function init(){
       console.error('No se pudo restaurar el entrenamiento', e);
       db.active = null; save();
       closeScreen('screen-workout');
-      toast('⚠️ No se pudo restaurar el entrenamiento en curso');
+      toast('No se pudo restaurar el entrenamiento en curso', 2400, 'alerta');
     }
   }
   renderRest();
