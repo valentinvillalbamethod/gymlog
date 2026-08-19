@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>GymLog</title>
+<meta name="description" content="Registro personal de entrenamientos. Funciona 100% sin conexión.">
+<meta name="theme-color" content="#0e0f13">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png"><!-- iOS no soporta SVG acá -->
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main id="main">
+
+  <!-- TAB: Rutinas (inicio) -->
+  <section id="tab-rutinas" class="tab active">
+    <header class="apphead">
+      <h1>GymLog</h1>
+      <div id="home-last" class="muted small"></div>
+    </header>
+    <div id="backup-hint"></div>
+    <div id="routines-list"></div>
+    <button class="btn primary big wide" id="btn-new-routine" onclick="openEditor(null)">＋ Nueva rutina</button>
+  </section>
+
+  <!-- TAB: Progreso -->
+  <section id="tab-progreso" class="tab">
+    <header class="apphead"><h1>Progreso</h1></header>
+    <div id="prog-stats" class="statrow"></div>
+    <div class="card calcard">
+      <div class="calhead">
+        <button class="btn icon" onclick="calMove(-1)">‹</button>
+        <div id="cal-title" class="caltitle"></div>
+        <button class="btn icon" onclick="calMove(1)">›</button>
+      </div>
+      <div class="calgrid caldows"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+      <div id="cal-grid" class="calgrid"></div>
+      <div id="day-detail"></div>
+    </div>
+    <h2>Por ejercicio</h2>
+    <button class="btn ghost wide" onclick="pickExerciseProgress()">📈 Ver progreso de un ejercicio</button>
+    <h2>Volumen por rutina</h2>
+    <div id="rvol-chips" class="chips"></div>
+    <div id="rvol-chart"></div>
+    <h2>Historial</h2>
+    <div id="history-list"></div>
+  </section>
+
+  <!-- TAB: Ajustes -->
+  <section id="tab-ajustes" class="tab">
+    <header class="apphead"><h1>Ajustes</h1></header>
+    <div id="settings-body"></div>
+  </section>
+
+</main>
+
+<!-- Pantalla: editor de rutina -->
+<section id="screen-editor" class="screen">
+  <header class="screenhead">
+    <button class="btn icon" onclick="closeEditor()">←</button>
+    <input id="ed-name" class="namein" placeholder="Nombre (ej: Rutina A)" maxlength="30">
+    <button class="btn primary" onclick="saveEditor()">Guardar</button>
+  </header>
+  <div id="ed-body" class="screenbody"></div>
+</section>
+
+<!-- Pantalla: entrenamiento activo -->
+<section id="screen-workout" class="screen">
+  <header class="screenhead">
+    <button class="btn icon" onclick="closeWorkout()" title="Minimizar">▾</button>
+    <div class="wk-head">
+      <div id="wk-title"></div>
+      <div id="wk-elapsed" class="muted small"></div>
+    </div>
+    <button class="btn primary" onclick="finishWorkout()">Finalizar</button>
+  </header>
+  <div id="wk-body" class="screenbody"></div>
+</section>
+
+<!-- Pantalla: detalle de ejercicio -->
+<section id="screen-exdetail" class="screen">
+  <header class="screenhead">
+    <button class="btn icon" onclick="closeScreen('screen-exdetail')">←</button>
+    <div class="wk-head"><div id="exd-title"></div></div>
+    <span class="sp44"></span>
+  </header>
+  <div id="exd-body" class="screenbody"></div>
+</section>
+
+<!-- Barra de descanso -->
+<div id="restbar" class="restbar hidden">
+  <div class="restprog"><div id="rest-fill"></div></div>
+  <div class="restrow">
+    <div><div class="restlabel">Descanso</div><div id="rest-time">0:00</div></div>
+    <div class="restbtns">
+      <button class="btn ghost" onclick="restAdj(-15)">−15s</button>
+      <button class="btn ghost" onclick="restAdj(15)">+15s</button>
+      <button class="btn primary" onclick="restSkip()">Saltar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Banner entrenamiento activo (visible al minimizar) -->
+<button id="active-banner" class="hidden" onclick="openWorkout()">
+  ▶ <span id="ab-name"></span> en curso — tocá para volver
+</button>
+
+<nav id="bottomnav">
+  <button data-tab="rutinas" class="active" onclick="showTab('rutinas')"><span class="nicon">🏋️</span><span>Rutinas</span></button>
+  <button data-tab="progreso" onclick="showTab('progreso')"><span class="nicon">📈</span><span>Progreso</span></button>
+  <button data-tab="ajustes" onclick="showTab('ajustes')"><span class="nicon">⚙️</span><span>Ajustes</span></button>
+</nav>
+
+<div id="modal-root"></div>
+<div id="toast" class="hidden"></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
