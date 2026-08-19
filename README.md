@@ -23,14 +23,20 @@ y abrir http://localhost:8123
 
 ## Instalar en el celular
 
-La forma más simple (una sola vez con internet, después funciona por siempre offline):
+La app está publicada en:
 
-1. Subí este repo a GitHub y activá **GitHub Pages** (Settings → Pages → branch `main`).
-2. Abrí la URL de Pages en Chrome del celular.
-3. Menú ⋮ → **"Agregar a la pantalla de inicio"** / **"Instalar app"**.
-4. Listo: se abre como app propia, sin barra del navegador, y funciona sin conexión gracias al service worker.
+**https://valentinvillalbamethod.github.io/gymlog/**
 
-Alternativa sin GitHub: serví la carpeta desde tu PC en la red local (`python -m http.server`) y abrí `http://IP-DE-TU-PC:8123` desde el celular (la instalación como PWA requiere HTTPS o localhost, pero podés usarla igual desde el navegador).
+Una sola vez con internet, después funciona offline para siempre:
+
+1. Abrí esa URL en Chrome (Android) o Safari (iPhone) del celular.
+2. Android: menú ⋮ → **"Instalar app"** / **"Agregar a la pantalla de inicio"**.
+   iPhone: botón Compartir → **"Agregar a inicio"**.
+3. Listo: se abre como app propia, sin barra del navegador, y anda sin conexión.
+
+Cada vez que se actualice el código en `main`, GitHub Pages lo republica y la app
+se actualiza sola la próxima vez que la abras con internet (service worker con
+estrategia *stale-while-revalidate*).
 
 ## Tus datos
 
